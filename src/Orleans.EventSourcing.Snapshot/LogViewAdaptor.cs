@@ -186,6 +186,7 @@ namespace Orleans.EventSourcing.Snapshot
                     if (_snapshotStrategy(GetSnapshotStrategyInfo())) 
                     {
                         _snapshotState.StateAndMetaData.SnapshotVersion = _confirmedVersionInternal;
+                        _snapshotState.StateAndMetaData.SnapshotUpdatedTime = DateTime.Now;
                         _snapshotState.StateAndMetaData.Snapshot = _confirmedViewInternal.DeepClone();
                     }
 
