@@ -1,0 +1,91 @@
+﻿using Orleans.EventSourcing.Common;
+using System;
+using System.Collections.Generic;
+
+namespace Orleans.EventSourcing.Snapshot
+{
+    [Serializable]
+    public class SnapshotStateWithMetaDataAndETag<TState, TEntry> : IGrainState 
+        where TState : class, new()
+        where TEntry : class
+    {
+        public SnapshotStateWithMetaData<TState, TEntry> StateAndMetaData { get; set; }
+
+        public string ETag { get; set; }
+
+        public Type Type => typeof(SnapshotStateWithMetaData<TState, TEntry>);
+
+        object IGrainState.State
+        {
+            get
+            {
+                return StateAndMetaData;
+            }
+            set
+            {
+                StateAndMetaData = (SnapshotStateWithMetaData<TState, TEntry>)value;
+            }
+        }
+
+        public SnapshotStateWithMetaDataAndETag()
+        {
+            StateAndMetaData = new SnapshotStateWithMetaData<TState, TEntry>();
+        }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "v{0} Flags={1} ETag={2} Snapshot={3} Log={4}", 
+                StateAndMetaData.GlobalVersion, 
+                StateAndMetaData.WriteVector, 
+                ETag,
+                StateAndMetaData.Snapshot,
+                StateAndMetaData.Log);
+        }
+    }
+
+    [Serializable]
+    public class SnapshotStateWithMetaData<TState, TEntry> 
+        where TState : class, new()
+        where TEntry : class
+    { 
+        public List<TEntry> Log { get; set; }
+
+        public TState Snapshot { get; set; }
+
+        public DateTime? SnapshotUpdatedTime { get; set; }
+
+        public int GlobalVersion { get; set; }
+
+        public int SnapshotVersion { get; set; }
+
+        public string WriteVector { get; set; }
+
+        public SnapshotStateWithMetaData() 
+        {
+            Snapshot = new TState();
+            SnapshotVersion = 0;
+            WriteVector = "";
+        }
+
+        public SnapshotStateWithMetaData(TState snapshot, int snapshotVersion) 
+        {
+            Snapshot = snapshot;
+            SnapshotVersion = snapshotVersion;
+            WriteVector = "";
+        }
+
+        public bool GetBit(string Replica)
+        {
+            return StringEncodedWriteVector.GetBit(WriteVector, Replica);
+        }
+
+        public bool FlipBit(string Replica)
+        {
+            var str = WriteVector;
+            var rval = StringEncodedWriteVector.FlipBit(ref str, Replica);
+            WriteVector = str;
+            return rval;
+        }
+    }
+}

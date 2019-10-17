@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Orleans.EventSourcing.Snapshot</AssemblyName>
+    <RootNamespace>Orleans.EventSourcing.Snapshot</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DeepCloner" Version="0.10.2" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="2.3.0" />
+  </ItemGroup>
+
+</Project>
