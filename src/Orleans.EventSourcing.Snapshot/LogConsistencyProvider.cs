@@ -50,14 +50,11 @@ namespace Orleans.EventSourcing.Snapshot
         public static ILogViewAdaptorFactory Create(IServiceProvider services, string name, Func<SnapshotStrategyInfo, bool> snapshotStrategy)
         {
             var optionsMonitor = services.GetRequiredService<IOptionsMonitor<SnapshotStorageLogConsistencyOptions>>();
-
             var options = optionsMonitor.Get(name);
-            IGrainEventStorage eventStorage = null;
 
-            if (options.UseIndependentEventStorage) 
-            {
-                eventStorage = services.GetRequiredService<IGrainEventStorage>();
-            }
+            var eventStorage = options.UseIndependentEventStorage
+                ? services.GetRequiredService<IGrainEventStorage>()
+                : new NullGrainEventStorage();
 
             return ActivatorUtilities.CreateInstance<LogConsistencyProvider>(services, options, eventStorage, snapshotStrategy);
         }
