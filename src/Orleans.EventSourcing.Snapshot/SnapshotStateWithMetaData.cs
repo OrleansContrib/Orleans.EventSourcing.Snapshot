@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Orleans.EventSourcing.Snapshot
 {
     [Serializable]
-    public class SnapshotStateWithMetaDataAndETag<TState, TEntry> : IGrainState 
+    public class SnapshotStateWithMetaDataAndETag<TState, TEntry> : IGrainState
         where TState : class, new()
         where TEntry : class
     {
@@ -35,9 +35,9 @@ namespace Orleans.EventSourcing.Snapshot
         public override string ToString()
         {
             return string.Format(
-                "v{0} Flags={1} ETag={2} Snapshot={3} Log={4}", 
-                StateAndMetaData.GlobalVersion, 
-                StateAndMetaData.WriteVector, 
+                "v{0} Flags={1} ETag={2} Snapshot={3} Log={4}",
+                StateAndMetaData.GlobalVersion,
+                StateAndMetaData.WriteVector,
                 ETag,
                 StateAndMetaData.Snapshot,
                 StateAndMetaData.Log);
@@ -45,10 +45,10 @@ namespace Orleans.EventSourcing.Snapshot
     }
 
     [Serializable]
-    public class SnapshotStateWithMetaData<TState, TEntry> 
+    public class SnapshotStateWithMetaData<TState, TEntry>
         where TState : class, new()
         where TEntry : class
-    { 
+    {
         public List<TEntry> Log { get; set; }
 
         public TState Snapshot { get; set; }
@@ -61,17 +61,11 @@ namespace Orleans.EventSourcing.Snapshot
 
         public string WriteVector { get; set; }
 
-        public SnapshotStateWithMetaData() 
+        public SnapshotStateWithMetaData()
         {
+            Log = new List<TEntry>();
             Snapshot = new TState();
             SnapshotVersion = 0;
-            WriteVector = "";
-        }
-
-        public SnapshotStateWithMetaData(TState snapshot, int snapshotVersion) 
-        {
-            Snapshot = snapshot;
-            SnapshotVersion = snapshotVersion;
             WriteVector = "";
         }
 

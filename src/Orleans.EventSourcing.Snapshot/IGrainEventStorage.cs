@@ -9,5 +9,7 @@ namespace Orleans.EventSourcing.Snapshot
         Task Save<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events);
 
         Task<List<TEvent>> RetrieveEvents<TEvent>(string grainTypeName, GrainReference grainReference, int fromVersion, int toVersion);
+
+        Task<int> EventsCount(string grainTypeName, GrainReference grainReference);
     }
 }

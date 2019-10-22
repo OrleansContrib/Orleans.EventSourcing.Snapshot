@@ -29,7 +29,7 @@ namespace Orleans.EventSourcing.Snapshot
         private int _confirmedVersionInternal;
 
         public LogViewAdaptor(
-            ILogViewAdaptorHost<TLogView, TLogEntry> host, 
+            ILogViewAdaptorHost<TLogView, TLogEntry> host,
             TLogView initialState,
             IGrainStorage grainStorage,
             string grainTypeName,
@@ -44,16 +44,21 @@ namespace Orleans.EventSourcing.Snapshot
             _snapshotStrategy = snapshotStrategy;
             _useIndependentEventStorage = useIndependentEventStorage;
 
-            if (useIndependentEventStorage) 
+            if (useIndependentEventStorage)
             {
-                _eventStorage = eventStorage 
-                    ?? throw new ArgumentNullException(nameof(eventStorage), 
+                _eventStorage = eventStorage
+                    ?? throw new ArgumentNullException(nameof(eventStorage),
                         "Must set eventStorage when useIndependentEventStorage is true");
             }
         }
 
         public override async Task<IReadOnlyList<TLogEntry>> RetrieveLogSegment(int fromVersion, int toVersion)
         {
+            if (!_useIndependentEventStorage)
+            {
+                return _snapshotState.StateAndMetaData.Log.GetRange(fromVersion, (toVersion - fromVersion));
+            }
+
             IReadOnlyList<TLogEntry> segment;
             int cachedLogCount = _snapshotState.StateAndMetaData.Log.Count;
 
@@ -114,13 +119,14 @@ namespace Orleans.EventSourcing.Snapshot
                 try
                 {
                     await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainReference, _snapshotState);
+                    await EnsureStateGlobalVersion();
 
                     Services.Log(LogLevel.Debug, "read success {0}", _snapshotState);
 
                     if (_confirmedVersionInternal < _snapshotState.StateAndMetaData.SnapshotVersion)
                     {
                         _confirmedVersionInternal = _snapshotState.StateAndMetaData.SnapshotVersion;
-                        _confirmedViewInternal = _snapshotState.StateAndMetaData.Snapshot;
+                        _confirmedViewInternal = _snapshotState.StateAndMetaData.Snapshot.DeepClone();
                     }
 
                     var logs = await RetrieveLogSegment(
@@ -157,23 +163,25 @@ namespace Orleans.EventSourcing.Snapshot
             bool logsSuccessfullySaved = false;
 
             var writebit = _snapshotState.StateAndMetaData.FlipBit(Services.MyClusterId);
-            if (!_useIndependentEventStorage) 
+            if (!_useIndependentEventStorage)
             {
                 foreach (var x in updates)
                 {
                     _snapshotState.StateAndMetaData.Log.Add(x.Entry);
                 }
 
+                _snapshotState.StateAndMetaData.GlobalVersion += updates.Length;
                 logsSuccessfullySaved = true;
             }
-            else 
+            else
             {
                 try
                 {
                     await _eventStorage.Save(_grainTypeName, Services.GrainReference, updates.Select(x => x.Entry));
+                    _snapshotState.StateAndMetaData.GlobalVersion += updates.Length;
                     logsSuccessfullySaved = true;
                 }
-                catch (Exception e) 
+                catch (Exception e)
                 {
                     LastPrimaryIssue.Record(new UpdateEventStorageFailed() { Exception = e }, Host, Services);
                 }
@@ -183,7 +191,7 @@ namespace Orleans.EventSourcing.Snapshot
             {
                 try
                 {
-                    if (_snapshotStrategy(GetSnapshotStrategyInfo())) 
+                    if (_snapshotStrategy(GetSnapshotStrategyInfo()))
                     {
                         _snapshotState.StateAndMetaData.SnapshotVersion = _confirmedVersionInternal;
                         _snapshotState.StateAndMetaData.SnapshotUpdatedTime = DateTime.Now;
@@ -327,6 +335,7 @@ namespace Orleans.EventSourcing.Snapshot
                 }
 
                 _snapshotState.StateAndMetaData.FlipBit(updateNotification.Origin);
+                _snapshotState.StateAndMetaData.GlobalVersion = updateNotification.Version;
 
                 _snapshotState.ETag = updateNotification.ETag;
 
@@ -411,7 +420,21 @@ namespace Orleans.EventSourcing.Snapshot
             _confirmedVersionInternal += pendingLogs.Count();
         }
 
-        private SnapshotStrategyInfo GetSnapshotStrategyInfo() 
+        private async Task EnsureStateGlobalVersion()
+        {
+            if (!_useIndependentEventStorage)
+            {
+                _snapshotState.StateAndMetaData.GlobalVersion = _snapshotState.StateAndMetaData.Log.Count;
+            }
+            else
+            {
+                var count = await _eventStorage.EventsCount(_grainTypeName, Services.GrainReference);
+
+                _snapshotState.StateAndMetaData.GlobalVersion = count + _snapshotState.StateAndMetaData.Log.Count;
+            }
+        }
+
+        private SnapshotStrategyInfo GetSnapshotStrategyInfo()
         {
             return new SnapshotStrategyInfo
             {
