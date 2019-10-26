@@ -68,18 +68,18 @@ namespace Orleans.EventSourcing.Snapshot
             }
             else if (fromVersion >= cachedLogCount)
             {
-                segment = await _eventStorage.RetrieveEvents<TLogEntry>(
-                    _grainTypeName, Services.GrainReference, fromVersion, toVersion);
+                segment = await _eventStorage.ReadEvents<TLogEntry>(
+                    _grainTypeName, Services.GrainReference, fromVersion - cachedLogCount, (toVersion - fromVersion));
             }
-            else if (toVersion < cachedLogCount)
+            else if (toVersion <= cachedLogCount)
             {
                 segment = _snapshotState.StateAndMetaData.Log.GetRange(fromVersion, (toVersion - fromVersion));
             }
             else
             {
                 var segmentPart1 = _snapshotState.StateAndMetaData.Log.GetRange(fromVersion, (cachedLogCount - fromVersion));
-                var segmentPart2 = await _eventStorage.RetrieveEvents<TLogEntry>(
-                    _grainTypeName, Services.GrainReference, cachedLogCount, toVersion);
+                var segmentPart2 = await _eventStorage.ReadEvents<TLogEntry>(
+                    _grainTypeName, Services.GrainReference, cachedLogCount, toVersion - cachedLogCount);
 
                 segmentPart1.AddRange(segmentPart2);
                 segment = segmentPart1;
@@ -177,8 +177,15 @@ namespace Orleans.EventSourcing.Snapshot
             {
                 try
                 {
-                    await _eventStorage.Save(_grainTypeName, Services.GrainReference, updates.Select(x => x.Entry));
-                    _snapshotState.StateAndMetaData.GlobalVersion += updates.Length;
+                    int expectedVersion = _snapshotState.StateAndMetaData.GlobalVersion + updates.Length;
+
+                    await _eventStorage.SaveEvents(
+                        _grainTypeName,
+                        Services.GrainReference,
+                        updates.Select(x => x.Entry),
+                        expectedVersion - _snapshotState.StateAndMetaData.Log.Count);
+
+                    _snapshotState.StateAndMetaData.GlobalVersion = expectedVersion;
                     logsSuccessfullySaved = true;
                 }
                 catch (Exception e)

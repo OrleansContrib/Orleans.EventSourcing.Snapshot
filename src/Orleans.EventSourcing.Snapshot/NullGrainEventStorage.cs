@@ -12,14 +12,14 @@ namespace Orleans.EventSourcing.Snapshot
             throw new NotSupportedException();
         }
 
-        public Task<List<TEvent>> RetrieveEvents<TEvent>(string grainTypeName, GrainReference grainReference, int fromVersion, int toVersion)
+        public Task<List<TEvent>> ReadEvents<TEvent>(string grainTypeName, GrainReference grainReference, int start, int count)
         {
             throw new NotSupportedException();
         }
 
-        public Task Save<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events)
+        public Task SaveEvents<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events, int expectedVersion)
         {
-            throw new NotSupportedException();
+            throw new NotImplementedException();
         }
     }
 }

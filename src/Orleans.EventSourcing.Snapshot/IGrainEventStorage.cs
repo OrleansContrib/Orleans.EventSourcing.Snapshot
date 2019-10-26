@@ -6,9 +6,9 @@ namespace Orleans.EventSourcing.Snapshot
 {
     public interface IGrainEventStorage
     {
-        Task Save<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events);
+        Task SaveEvents<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events, int expectedVersion);
 
-        Task<List<TEvent>> RetrieveEvents<TEvent>(string grainTypeName, GrainReference grainReference, int fromVersion, int toVersion);
+        Task<List<TEvent>> ReadEvents<TEvent>(string grainTypeName, GrainReference grainReference, int start, int count);
 
         Task<int> EventsCount(string grainTypeName, GrainReference grainReference);
     }
