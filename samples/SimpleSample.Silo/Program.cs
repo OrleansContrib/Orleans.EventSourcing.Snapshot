@@ -21,6 +21,7 @@ namespace SimpleSample.Silo
             var host = BuildSilo();
 
             await host.StartAsync();
+            Console.WriteLine("SimpleSample silo started");
 
             Console.ReadLine();
         }
