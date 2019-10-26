@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSample.Grains", "samp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSample.Silo", "samples\SimpleSample.Silo\SimpleSample.Silo.csproj", "{4AAEFD08-1B80-415B-B211-BC4F8C09B66E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSample.Client", "SimpleSample.Client\SimpleSample.Client.csproj", "{6F9E24C5-642D-49CF-A509-827422C5F140}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSample.Client", "samples\SimpleSample.Client\SimpleSample.Client.csproj", "{5BF46921-800F-46BF-9699-EE2E9B3BE7D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +37,10 @@ Global
 		{4AAEFD08-1B80-415B-B211-BC4F8C09B66E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AAEFD08-1B80-415B-B211-BC4F8C09B66E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AAEFD08-1B80-415B-B211-BC4F8C09B66E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6F9E24C5-642D-49CF-A509-827422C5F140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F9E24C5-642D-49CF-A509-827422C5F140}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F9E24C5-642D-49CF-A509-827422C5F140}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F9E24C5-642D-49CF-A509-827422C5F140}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BF46921-800F-46BF-9699-EE2E9B3BE7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BF46921-800F-46BF-9699-EE2E9B3BE7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BF46921-800F-46BF-9699-EE2E9B3BE7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BF46921-800F-46BF-9699-EE2E9B3BE7D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,7 +49,7 @@ Global
 		{46C3F25B-6094-43BF-B31F-8B32CE2451B4} = {84F6FF66-BD59-43B7-83AE-2D90937C93ED}
 		{46257723-0CC5-429A-9543-0E175536C95F} = {84F6FF66-BD59-43B7-83AE-2D90937C93ED}
 		{4AAEFD08-1B80-415B-B211-BC4F8C09B66E} = {84F6FF66-BD59-43B7-83AE-2D90937C93ED}
-		{6F9E24C5-642D-49CF-A509-827422C5F140} = {84F6FF66-BD59-43B7-83AE-2D90937C93ED}
+		{5BF46921-800F-46BF-9699-EE2E9B3BE7D7} = {84F6FF66-BD59-43B7-83AE-2D90937C93ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {18A7AD46-266A-4C05-835A-6A2FA2858BFC}

@@ -3,7 +3,6 @@ using JsonNet.PrivateSettersContractResolvers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans;
-using Orleans.Configuration;
 using Orleans.EventSourcing.Snapshot;
 using Orleans.EventSourcing.Snapshot.Hosting;
 using Orleans.Hosting;
@@ -29,11 +28,7 @@ namespace SimpleSample.Silo
         private static ISiloHost BuildSilo()
         {
             var builder = new SiloHostBuilder()
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "SimpleSample";
-                    options.ServiceId = "SimpleSample";
-                })
+                .UseLocalhostClustering()
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PersonGrain).Assembly).WithReferences())
                 .ConfigureLogging(logging =>
                 {
@@ -42,7 +37,7 @@ namespace SimpleSample.Silo
                 .AddMongoDBGrainStorageAsDefault((MongoDBGrainStorageOptions op) =>
                 {
                     op.CollectionPrefix = "GrainStorage";
-                    op.ConnectionString = "mongodb://127.0.0.1:27017";
+                    op.ConnectionString = "mongodb://localhost:27017";
                     op.DatabaseName = "SimpleSampleOrelans";
 
                     op.ConfigureJsonSerializerSettings = jsonSettings =>
@@ -58,7 +53,7 @@ namespace SimpleSample.Silo
                     // Should configure event storage when set UseIndependentEventStorage true
                     op.ConfigureIndependentEventStorage = (services, name) =>
                     {
-                        var eventStoreConnectionString = "ConnectTo=tcp://admin:changeit@127.0.0.1:1113; HeartBeatTimeout=500";
+                        var eventStoreConnectionString = "ConnectTo=tcp://admin:changeit@localhost:1113; HeartBeatTimeout=500";
                         var eventStoreConnection = EventStoreConnection.Create(eventStoreConnectionString);
                         eventStoreConnection.ConnectAsync().Wait();
 

@@ -12,7 +12,7 @@ namespace SimpleSample.Client
     {
         static async Task Main(string[] args)
         {
-            var clusterClient = BuildOrleansClient();
+            var clusterClient = await BuildOrleansClient();
 
             var personId = Guid.NewGuid();
             var person = clusterClient.GetGrain<IPersonGrain>(personId);
@@ -38,7 +38,7 @@ namespace SimpleSample.Client
             }
         }
 
-        private static IClusterClient BuildOrleansClient()
+        private static async Task<IClusterClient> BuildOrleansClient()
         {
             var endPoints = new List<IPEndPoint>();
 
@@ -57,14 +57,7 @@ namespace SimpleSample.Client
                 .UseStaticClustering(endPoints.ToArray())
                 .Build();
 
-            client.Connect(async ex =>
-            {
-                Console.WriteLine("Connect orleans error", ex);
-
-                await Task.Delay(1000);
-
-                return true;
-            });
+            await client.Connect();
 
             return client;
         }
