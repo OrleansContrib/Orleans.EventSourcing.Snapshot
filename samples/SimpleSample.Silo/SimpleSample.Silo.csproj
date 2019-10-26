@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EventStore.Client" Version="5.0.2" />
+    <PackageReference Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.0.0" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Orleans.EventSourcing.Snapshot\Orleans.EventSourcing.Snapshot.csproj" />
+    <ProjectReference Include="..\SimpleSample.GrainInterfaces\SimpleSample.GrainInterfaces.csproj" />
+    <ProjectReference Include="..\SimpleSample.Grains\SimpleSample.Grains.csproj" />
+  </ItemGroup>
+
+</Project>
