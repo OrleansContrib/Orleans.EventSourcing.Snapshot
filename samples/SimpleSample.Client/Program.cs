@@ -14,7 +14,7 @@ namespace SimpleSample.Client
         {
             var clusterClient = await BuildOrleansClient();
 
-            var personId = Guid.NewGuid();
+            var personId = Guid.Empty;
             var person = clusterClient.GetGrain<IPersonGrain>(personId);
 
             Console.WriteLine("Please input your nickname: ");
