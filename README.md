@@ -22,7 +22,18 @@ Add this provider to SiloBuilder:
         };
     });
         
-if you set `UseIndependentEventStorage` false, This provider use grain storage to store the snapshot and event sequence. Otherwise, This provider use grain storage to store the snapshot state, And use independent event storage that you configurated to store the event sequence.
+if you set `UseIndependentEventStorage` false, This provider use grain storage to store the snapshot and event sequence. Otherwise, This provider use grain storage to store the snapshot state, And use independent event storage that you configurated to store the event sequence. How to configurate the independent event store you can see the code above. 
+
+To use the inpendent event store, you need implement `IGrainEventStorage` interface:
+
+    public interface IGrainEventStorage
+    {
+        Task SaveEvents<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events, int expectedVersion);
+
+        Task<List<TEvent>> ReadEvents<TEvent>(string grainTypeName, GrainReference grainReference, int start, int count);
+
+        Task<int> EventsCount(string grainTypeName, GrainReference grainReference);
+    }
 
 This provider does support `RetrieveConfirmedEvents`. All events are always available, And where the event keep in denpend on your configuration.
 
