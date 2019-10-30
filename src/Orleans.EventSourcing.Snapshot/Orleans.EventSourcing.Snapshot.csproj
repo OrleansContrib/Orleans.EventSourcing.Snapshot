@@ -1,9 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Orleans.EventSourcing.Snapshot</AssemblyName>
     <RootNamespace>Orleans.EventSourcing.Snapshot</RootNamespace>
+    <Version>1.0.1</Version>
+    <Authors>Jeffrey Zhang</Authors>
+    <Product />
+    <Description>Snapshot storage provider for orleans event sourcing</Description>
+    <PackageProjectUrl>https://github.com/zh6335901/Orleans.EventSourcing.Snapshot</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
