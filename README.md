@@ -24,7 +24,7 @@ Add this provider to SiloBuilder:
         
 if you set `UseIndependentEventStorage` false, This provider use grain storage to store the snapshot and event sequence. Otherwise, This provider use grain storage to store the snapshot state, And use independent event storage that you configurated to store the event sequence. How to configurate the independent event store you can see the code above. 
 
-To use the inpendent event store, you need implement `IGrainEventStorage` interface:
+To use the independent event store, you need implement `IGrainEventStorage` interface:
 
     public interface IGrainEventStorage
     {
