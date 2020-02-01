@@ -27,26 +27,44 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
             var snapshotStorageOptions = new SnapshotStorageOptions();
             configureSnapshotStorageOptions?.Invoke(snapshotStorageOptions, name);
 
-            return builder.ConfigureServices(services => 
-            {
-                services.AddSnapshotStorageLogConsistencyOptions(snapshotStorageOptions.UseIndependentEventStorage, name);
+            return builder.ConfigureServices(services => services
+                .AddSnapshotStorageBasedLogConsistencyProvider(snapshotStorageOptions, name));
+        }
 
-                if (snapshotStorageOptions.UseIndependentEventStorage) 
-                {
-                    snapshotStorageOptions.ConfigureIndependentEventStorage?.Invoke(services, name);
-                }
+        public static ISiloBuilder AddLogStorageBasedLogConsistencyProviderAsDefault(
+            this ISiloBuilder builder,
+            Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions)
+        {
+            return builder.AddSnapshotStorageBasedLogConsistencyProvider(
+                configureSnapshotStorageOptions, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
+        }
 
-                services.AddSnapshotStorageBasedLogConsistencyProvider(snapshotStorageOptions.SnapshotStrategy, name);   
-            });
+        public static ISiloBuilder AddSnapshotStorageBasedLogConsistencyProvider(
+            this ISiloBuilder builder,
+            Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions,
+            string name = "SnapshotStorage")
+        {
+            var snapshotStorageOptions = new SnapshotStorageOptions();
+            configureSnapshotStorageOptions?.Invoke(snapshotStorageOptions, name);
+
+            return builder.ConfigureServices(services => services
+                .AddSnapshotStorageBasedLogConsistencyProvider(snapshotStorageOptions, name));
         }
 
         internal static IServiceCollection AddSnapshotStorageBasedLogConsistencyProvider(
             this IServiceCollection services,
-            Func<SnapshotStrategyInfo, bool> snapshotStrategy,
+            SnapshotStorageOptions options,
             string name)
         {
+            services.AddSnapshotStorageLogConsistencyOptions(options.UseIndependentEventStorage, name);
+
+            if (options.UseIndependentEventStorage)
+            {
+                options.ConfigureIndependentEventStorage?.Invoke(services, name);
+            }
+
             services
-                .AddSingletonNamedService(name, (sp, n) => LogConsistencyProviderFactory.Create(sp, n, snapshotStrategy))
+                .AddSingletonNamedService(name, (sp, n) => LogConsistencyProviderFactory.Create(sp, n, options.SnapshotStrategy))
                 .TryAddSingleton(sp => sp.GetServiceByName<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
 
             return services;
