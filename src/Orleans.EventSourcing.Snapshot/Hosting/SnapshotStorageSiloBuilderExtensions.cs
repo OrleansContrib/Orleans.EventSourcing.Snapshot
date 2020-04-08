@@ -19,6 +19,14 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
                 configureSnapshotStorageOptions, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
         }
 
+        public static ISiloBuilder AddSnapshotStorageBasedConsistencyProviderAsDefault(
+            this ISiloBuilder builder,
+            Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions)
+        {
+            return builder.AddSnapshotStorageBasedLogConsistencyProvider(
+                configureSnapshotStorageOptions, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
+        }
+
         public static ISiloHostBuilder AddSnapshotStorageBasedLogConsistencyProvider(
             this ISiloHostBuilder builder,
             Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions,
@@ -29,14 +37,6 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
 
             return builder.ConfigureServices(services => services
                 .AddSnapshotStorageBasedLogConsistencyProvider(snapshotStorageOptions, name));
-        }
-
-        public static ISiloBuilder AddLogStorageBasedLogConsistencyProviderAsDefault(
-            this ISiloBuilder builder,
-            Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions)
-        {
-            return builder.AddSnapshotStorageBasedLogConsistencyProvider(
-                configureSnapshotStorageOptions, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
         }
 
         public static ISiloBuilder AddSnapshotStorageBasedLogConsistencyProvider(
@@ -71,9 +71,9 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
         }
 
         internal static IServiceCollection AddSnapshotStorageLogConsistencyOptions(
-            this IServiceCollection services, 
-            bool useIndependentEventStorage, 
-            string name) 
+            this IServiceCollection services,
+            bool useIndependentEventStorage,
+            string name)
         {
             services.AddOptions<SnapshotStorageLogConsistencyOptions>(name)
                .Configure(options => options.UseIndependentEventStorage = useIndependentEventStorage);

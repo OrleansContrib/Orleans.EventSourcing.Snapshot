@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Orleans.EventSourcing.Snapshot</AssemblyName>
     <RootNamespace>Orleans.EventSourcing.Snapshot</RootNamespace>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Jeffrey Zhang</Authors>
     <Product />
     <Description>Snapshot storage provider for orleans event sourcing</Description>
