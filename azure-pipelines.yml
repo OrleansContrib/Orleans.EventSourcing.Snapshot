@@ -16,6 +16,10 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  configuration: 'Release'
+  projectPath: src/Orleans.EventSourcing.Snapshot/Orleans.EventSourcing.Snapshot.csproj
+
 steps:
   - task: UseDotNet@2
     displayName: 'Install .NET Core SDK'
@@ -24,7 +28,22 @@ steps:
       version: '3.x'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Build Project'
     inputs:
       command: 'build'
-      projects: 'src/Orleans.EventSourcing.Snapshot/Orleans.EventSourcing.Snapshot.csproj'
+      configuration: $(configuration)
+      projects: $(projectPath)
+  
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'pack'
+      packagesToPack: $(projectPath)
+      nobuild: true
+      versioningScheme: 'off'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
 
