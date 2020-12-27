@@ -34,10 +34,10 @@ namespace SimpleSample.Silo
                 {
                     logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
                 })
+                .UseMongoDBClient("mongodb://localhost:27017")
                 .AddMongoDBGrainStorageAsDefault((MongoDBGrainStorageOptions op) =>
                 {
                     op.CollectionPrefix = "GrainStorage";
-                    op.ConnectionString = "mongodb://localhost:27017";
                     op.DatabaseName = "SimpleSampleOrelans";
 
                     op.ConfigureJsonSerializerSettings = jsonSettings =>

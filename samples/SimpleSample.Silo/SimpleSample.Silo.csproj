@@ -18,9 +18,9 @@
   <ItemGroup>
     <PackageReference Include="EventStore.Client" Version="5.0.2" />
     <PackageReference Include="JsonNet.PrivateSettersContractResolvers" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Orleans.Server" Version="3.0.0" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.3.0" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>

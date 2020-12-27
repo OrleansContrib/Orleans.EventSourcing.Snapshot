@@ -269,17 +269,6 @@ namespace Orleans.EventSourcing.Snapshot
                 }
             }
 
-            if (batchSuccessfullyWritten)
-            {
-                BroadcastNotification(new UpdateNotificationMessage()
-                {
-                    Version = _snapshotState.StateAndMetaData.GlobalVersion,
-                    Updates = updates.Select(se => se.Entry).ToList(),
-                    Origin = Services.MyClusterId,
-                    ETag = _snapshotState.ETag
-                });
-            }
-
             exit_operation("WriteAsync");
 
             if (!batchSuccessfullyWritten)
