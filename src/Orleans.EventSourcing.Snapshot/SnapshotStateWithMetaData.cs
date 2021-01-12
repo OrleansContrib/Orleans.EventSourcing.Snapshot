@@ -12,19 +12,19 @@ namespace Orleans.EventSourcing.Snapshot
         public SnapshotStateWithMetaData<TState, TEntry> StateAndMetaData { get; set; }
 
         public string ETag { get; set; }
+		
+        public bool RecordExists
+        {
+            get => StateAndMetaData.GlobalVersion > 0;
+            set => _ = value;
+        }
 
         public Type Type => typeof(SnapshotStateWithMetaData<TState, TEntry>);
 
         object IGrainState.State
         {
-            get
-            {
-                return StateAndMetaData;
-            }
-            set
-            {
-                StateAndMetaData = (SnapshotStateWithMetaData<TState, TEntry>)value;
-            }
+            get => StateAndMetaData;
+            set => StateAndMetaData = (SnapshotStateWithMetaData<TState, TEntry>)value;
         }
 
         public SnapshotStateWithMetaDataAndETag()
