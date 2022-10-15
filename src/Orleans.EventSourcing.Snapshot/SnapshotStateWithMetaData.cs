@@ -46,9 +46,9 @@ namespace Orleans.EventSourcing.Snapshot
 
     public interface ISnapshotMetaData
     {
-    	public int SnapshotVersion { get; }
-	public int GlobalVersion { get; }
-	public DateTime? SnapshotUpdatedTime { get; }
+    	int SnapshotVersion { get; }
+	int GlobalVersion { get; }
+	DateTime? SnapshotUpdatedTime { get; }
     }
 
     [Serializable]
