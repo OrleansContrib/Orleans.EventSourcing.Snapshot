@@ -44,8 +44,15 @@ namespace Orleans.EventSourcing.Snapshot
         }
     }
 
+    public interface ISnapshotMetaData
+    {
+    	int SnapshotVersion { get; }
+	int GlobalVersion { get; }
+	DateTime? SnapshotUpdatedTime { get; }
+    }
+
     [Serializable]
-    public class SnapshotStateWithMetaData<TState, TEntry>
+    public class SnapshotStateWithMetaData<TState, TEntry> : ISnapshotMetaData
         where TState : class, new()
         where TEntry : class
     {
