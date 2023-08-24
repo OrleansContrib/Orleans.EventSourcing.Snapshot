@@ -7,9 +7,17 @@ using Orleans.EventSourcing.Snapshot;
 using Orleans.EventSourcing.Snapshot.Hosting;
 using Orleans.Hosting;
 using Orleans.Providers.MongoDB.Configuration;
-using SimpleSample.Grains;
 using System;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Orleans.EventSourcing;
+using Orleans.Providers.MongoDB.StorageProviders.Serializers;
+using Orleans.Runtime;
+using Orleans.Runtime.LogConsistency;
+using Orleans.Serialization;
+using SimpleSample.GrainInterfaces.State;
 
 namespace SimpleSample.Silo
 {
@@ -19,48 +27,66 @@ namespace SimpleSample.Silo
         {
             var host = BuildSilo();
 
-            await host.StartAsync();
-            Console.WriteLine("SimpleSample silo started");
-
-            Console.ReadLine();
+            await host.RunAsync();
         }
 
-        private static ISiloHost BuildSilo()
+        private static IHost BuildSilo()
         {
-            var builder = new SiloHostBuilder()
-                .UseLocalhostClustering()
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PersonGrain).Assembly).WithReferences())
-                .ConfigureLogging(logging =>
+            var builder = new HostBuilder()
+                .UseOrleans(o =>
                 {
-                    logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
-                })
-                .UseMongoDBClient("mongodb://localhost:27017")
-                .AddMongoDBGrainStorageAsDefault((MongoDBGrainStorageOptions op) =>
-                {
-                    op.CollectionPrefix = "GrainStorage";
-                    op.DatabaseName = "SimpleSampleOrelans";
-
-                    op.ConfigureJsonSerializerSettings = jsonSettings =>
+                    o.Services.AddMemoryCache(x =>
                     {
-                        jsonSettings.ContractResolver = new PrivateSetterContractResolver();
-                    };
-                })
-                .AddSnapshotStorageBasedLogConsistencyProviderAsDefault((op, name) => 
-                {
-                    // Take snapshot every five events
-                    op.SnapshotStrategy = strategyInfo => strategyInfo.CurrentConfirmedVersion - strategyInfo.SnapshotVersion >= 5;
-                    op.UseIndependentEventStorage = true;
-                    // Should configure event storage when set UseIndependentEventStorage true
-                    op.ConfigureIndependentEventStorage = (services, name) =>
-                    {
-                        var eventStoreConnectionString = "ConnectTo=tcp://admin:changeit@localhost:1113; HeartBeatTimeout=500";
-                        var eventStoreConnection = EventStoreConnection.Create(eventStoreConnectionString);
-                        eventStoreConnection.ConnectAsync().Wait();
+                        x.SizeLimit = 100;
+                    });
 
-                        services.AddSingleton(eventStoreConnection);
-                        services.AddSingleton<IGrainEventStorage, EventStoreGrainEventStorage>();
-                    };
+                    o.Services.AddSingleton<BlobServiceClient>(_ => new BlobServiceClient("UseDevelopmentStorage=true"));
+                    
+                    o.UseLocalhostClustering()
+                        .ConfigureLogging(logging =>
+                        {
+                            logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
+                        })
+                        .UseMongoDBClient("mongodb://localhost:27017")
+                        .AddMongoDBGrainStorageAsDefault((MongoDBGrainStorageOptions op) =>
+                        {
+                            op.CollectionPrefix = "GrainStorage";
+                            op.DatabaseName = "SimpleSampleOreleans";
+                        })
+                        .AddSnapshotStorageBasedLogConsistencyProviderAsDefault((op, name) => 
+                        {
+                            // Take snapshot every five events
+                            op.SnapshotStrategy = strategyInfo => strategyInfo.CurrentConfirmedVersion - strategyInfo.SnapshotVersion >= 5;
+                            op.UseIndependentEventStorage = true;
+                            // Should configure event storage when set UseIndependentEventStorage true
+                            op.ConfigureIndependentEventStorage = (services, name) =>
+                            {
+                                services.AddSingleton<IGrainEventStorage, BlobStorage>();
+                            };
+                        })
+                        // .AddSnapshotStorageBasedLogConsistencyProviderAsDefault((op, name) => 
+                        // {
+                        //     // Take snapshot every five events
+                        //     op.SnapshotStrategy = strategyInfo => strategyInfo.CurrentConfirmedVersion - strategyInfo.SnapshotVersion >= 5;
+                        //     op.UseIndependentEventStorage = true;
+                        //     // Should configure event storage when set UseIndependentEventStorage true
+                        //     op.ConfigureIndependentEventStorage = (services, name) =>
+                        //     {
+                        //         var eventStoreConnectionString = "ConnectTo=tcp://admin:changeit@localhost:1113; HeartBeatTimeout=500";
+                        //         var eventStoreConnection = EventStoreConnection.Create(eventStoreConnectionString);
+                        //         eventStoreConnection.ConnectAsync().Wait();
+                        //
+                        //         services.AddSingleton(eventStoreConnection);
+                        //         services.AddSingleton<IGrainEventStorage, EventStoreGrainEventStorage>();
+                        //     };
+                        // })
+                        .Services.TryAddSingleton<Factory<IGrainContext, ILogConsistencyProtocolServices>>(serviceProvider =>
+                        {
+                            var factory = ActivatorUtilities.CreateFactory(typeof(ProtocolServices), new[] { typeof(IGrainContext) });
+                            return arg1 => (ILogConsistencyProtocolServices)factory(serviceProvider, new object[] { arg1 });
+                        });
                 });
+                
 
             return builder.Build();
         }

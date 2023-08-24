@@ -7,17 +7,17 @@ namespace Orleans.EventSourcing.Snapshot
 {
     public class NullGrainEventStorage : IGrainEventStorage
     {
-        public Task<int> EventsCount(string grainTypeName, GrainReference grainReference)
+        public Task<int> EventsCount(string grainTypeName, GrainId grainReference)
         {
             throw new NotSupportedException();
         }
 
-        public Task<List<TEvent>> ReadEvents<TEvent>(string grainTypeName, GrainReference grainReference, int start, int count)
+        public Task<List<TEvent>> ReadEvents<TEvent>(string grainTypeName, GrainId grainReference, int start, int count)
         {
             throw new NotSupportedException();
         }
 
-        public Task SaveEvents<TEvent>(string grainTypeName, GrainReference grainReference, IEnumerable<TEvent> events, int expectedVersion)
+        public Task SaveEvents<TEvent>(string grainTypeName, GrainId grainReference, IEnumerable<TEvent> events, int expectedVersion)
         {
             throw new NotImplementedException();
         }

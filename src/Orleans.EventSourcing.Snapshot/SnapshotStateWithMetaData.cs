@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Orleans.EventSourcing.Snapshot
 {
     [Serializable]
-    public class SnapshotStateWithMetaDataAndETag<TState, TEntry> : IGrainState
+    public class SnapshotStateWithMetaDataAndETag<TState, TEntry> : IGrainState<SnapshotStateWithMetaData<TState, TEntry>>
         where TState : class, new()
         where TEntry : class
     {
@@ -21,7 +21,7 @@ namespace Orleans.EventSourcing.Snapshot
 
         public Type Type => typeof(SnapshotStateWithMetaData<TState, TEntry>);
 
-        object IGrainState.State
+        SnapshotStateWithMetaData<TState, TEntry> IGrainState<SnapshotStateWithMetaData<TState, TEntry>>.State
         {
             get => StateAndMetaData;
             set => StateAndMetaData = (SnapshotStateWithMetaData<TState, TEntry>)value;

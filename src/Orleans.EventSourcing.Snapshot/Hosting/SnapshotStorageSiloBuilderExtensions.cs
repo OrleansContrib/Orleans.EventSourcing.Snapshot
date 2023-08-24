@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.LogConsistency;
 using Orleans.Providers;
 using Orleans.Runtime;
 using System;
@@ -11,8 +10,8 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
 {
     public static class SnapshotStorageSiloBuilderExtensions
     {
-        public static ISiloHostBuilder AddSnapshotStorageBasedLogConsistencyProviderAsDefault(
-            this ISiloHostBuilder builder,
+        public static ISiloBuilder AddSnapshotStorageBasedLogConsistencyProviderAsDefault(
+            this ISiloBuilder builder,
             Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions)
         {
             return builder.AddSnapshotStorageBasedLogConsistencyProvider(
@@ -27,18 +26,7 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
                 configureSnapshotStorageOptions, ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
         }
 
-        public static ISiloHostBuilder AddSnapshotStorageBasedLogConsistencyProvider(
-            this ISiloHostBuilder builder,
-            Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions,
-            string name = "SnapshotStorage")
-        {
-            var snapshotStorageOptions = new SnapshotStorageOptions();
-            configureSnapshotStorageOptions?.Invoke(snapshotStorageOptions, name);
-
-            return builder.ConfigureServices(services => services
-                .AddSnapshotStorageBasedLogConsistencyProvider(snapshotStorageOptions, name));
-        }
-
+ 
         public static ISiloBuilder AddSnapshotStorageBasedLogConsistencyProvider(
             this ISiloBuilder builder,
             Action<SnapshotStorageOptions, string> configureSnapshotStorageOptions,

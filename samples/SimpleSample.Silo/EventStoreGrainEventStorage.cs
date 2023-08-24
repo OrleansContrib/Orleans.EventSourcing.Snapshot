@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Orleans;
+
+
 
 namespace SimpleSample.Silo
 {
@@ -41,7 +44,7 @@ namespace SimpleSample.Silo
             return this;
         }
 
-        public async Task<int> EventsCount(string grainTypeName, GrainReference grainReference)
+        public async Task<int> EventsCount(string grainTypeName, GrainId grainReference)
         {
             var (_, lastEventNumber) = await ReadLastEvent(grainTypeName, grainReference);
 
@@ -50,7 +53,7 @@ namespace SimpleSample.Silo
 
         public async Task<List<TEvent>> ReadEvents<TEvent>(
             string grainTypeName,
-            GrainReference grainReference,
+            GrainId grainReference,
             int start,
             int count)
         {
@@ -94,7 +97,7 @@ namespace SimpleSample.Silo
 
         public Task SaveEvents<TEvent>(
             string grainTypeName,
-            GrainReference grainReference,
+            GrainId grainReference,
             IEnumerable<TEvent> events,
             int expectedVersion)
         {
@@ -110,7 +113,7 @@ namespace SimpleSample.Silo
             return Task.CompletedTask;
         }
 
-        private async Task<(object Event, int EventNumber)> ReadLastEvent(string grainTypeName, GrainReference grainReference)
+        private async Task<(object Event, int EventNumber)> ReadLastEvent(string grainTypeName, GrainId grainReference)
         {
             var streamName = GetStreamName(grainTypeName, grainReference);
             var slice = await _eventStoreConnection
@@ -126,9 +129,9 @@ namespace SimpleSample.Silo
             return DeserializeEvent(slice.Events.First());
         }
 
-        private string GetStreamName(string grainTypeName, GrainReference grainReference)
+        private string GetStreamName(string grainTypeName, GrainId grainReference)
         {
-            return $"{grainTypeName}{grainReference.ToShortKeyString()}";
+            return $"{grainTypeName}{grainReference.ToString()}";
         }
 
         private EventData SerializeEvent(object @event)
