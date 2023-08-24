@@ -41,7 +41,7 @@ namespace SimpleSample.Silo
                     });
 
                     o.Services.AddSingleton<BlobServiceClient>(_ => new BlobServiceClient("UseDevelopmentStorage=true"));
-                    
+
                     o.UseLocalhostClustering()
                         .ConfigureLogging(logging =>
                         {
@@ -53,10 +53,11 @@ namespace SimpleSample.Silo
                             op.CollectionPrefix = "GrainStorage";
                             op.DatabaseName = "SimpleSampleOreleans";
                         })
-                        .AddSnapshotStorageBasedLogConsistencyProviderAsDefault((op, name) => 
+                        .AddSnapshotStorageBasedLogConsistencyProviderAsDefault((op, name) =>
                         {
                             // Take snapshot every five events
-                            op.SnapshotStrategy = strategyInfo => strategyInfo.CurrentConfirmedVersion - strategyInfo.SnapshotVersion >= 5;
+                            op.SnapshotStrategy = strategyInfo =>
+                                strategyInfo.CurrentConfirmedVersion - strategyInfo.SnapshotVersion >= 5;
                             op.UseIndependentEventStorage = true;
                             // Should configure event storage when set UseIndependentEventStorage true
                             op.ConfigureIndependentEventStorage = (services, name) =>
@@ -80,11 +81,7 @@ namespace SimpleSample.Silo
                         //         services.AddSingleton<IGrainEventStorage, EventStoreGrainEventStorage>();
                         //     };
                         // })
-                        .Services.TryAddSingleton<Factory<IGrainContext, ILogConsistencyProtocolServices>>(serviceProvider =>
-                        {
-                            var factory = ActivatorUtilities.CreateFactory(typeof(ProtocolServices), new[] { typeof(IGrainContext) });
-                            return arg1 => (ILogConsistencyProtocolServices)factory(serviceProvider, new object[] { arg1 });
-                        });
+                        ;
                 });
                 
 
