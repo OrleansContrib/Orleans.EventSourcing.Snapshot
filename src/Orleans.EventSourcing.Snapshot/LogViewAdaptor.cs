@@ -1,7 +1,6 @@
 ﻿using Force.DeepCloner;
 using Microsoft.Extensions.Logging;
 using Orleans.EventSourcing.Common;
-using Orleans.LogConsistency;
 using Orleans.Storage;
 using System;
 using System.Collections.Generic;
@@ -69,7 +68,7 @@ namespace Orleans.EventSourcing.Snapshot
             else if (fromVersion >= cachedLogCount)
             {
                 segment = await _eventStorage.ReadEvents<TLogEntry>(
-                    _grainTypeName, Services.GrainReference, fromVersion - cachedLogCount, (toVersion - fromVersion));
+                    _grainTypeName, Services.GrainId, fromVersion - cachedLogCount, (toVersion - fromVersion));
             }
             else if (toVersion <= cachedLogCount)
             {
@@ -79,7 +78,7 @@ namespace Orleans.EventSourcing.Snapshot
             {
                 var segmentPart1 = _snapshotState.StateAndMetaData.Log.GetRange(fromVersion, (cachedLogCount - fromVersion));
                 var segmentPart2 = await _eventStorage.ReadEvents<TLogEntry>(
-                    _grainTypeName, Services.GrainReference, cachedLogCount, toVersion - cachedLogCount);
+                    _grainTypeName, Services.GrainId, cachedLogCount, toVersion - cachedLogCount);
 
                 segmentPart1.AddRange(segmentPart2);
                 segment = segmentPart1;
@@ -118,7 +117,7 @@ namespace Orleans.EventSourcing.Snapshot
             {
                 try
                 {
-                    await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainReference, _snapshotState);
+                    await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainId, _snapshotState);
                     await EnsureStateGlobalVersion();
 
                     Services.Log(LogLevel.Debug, "read success {0}", _snapshotState);
@@ -181,7 +180,7 @@ namespace Orleans.EventSourcing.Snapshot
 
                     await _eventStorage.SaveEvents(
                         _grainTypeName,
-                        Services.GrainReference,
+                        Services.GrainId,
                         updates.Select(x => x.Entry),
                         expectedVersion - _snapshotState.StateAndMetaData.Log.Count);
 
@@ -205,7 +204,7 @@ namespace Orleans.EventSourcing.Snapshot
                         _snapshotState.StateAndMetaData.Snapshot = _confirmedViewInternal.DeepClone();
                     }
 
-                    await _grainStorage.WriteStateAsync(_grainTypeName, Services.GrainReference, _snapshotState);
+                    await _grainStorage.WriteStateAsync(_grainTypeName, Services.GrainId, _snapshotState);
 
                     batchSuccessfullyWritten = true;
 
@@ -231,7 +230,7 @@ namespace Orleans.EventSourcing.Snapshot
 
                     try
                     {
-                        await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainReference, _snapshotState);
+                        await _grainStorage.ReadStateAsync(_grainTypeName, Services.GrainId, _snapshotState);
 
                         Services.Log(LogLevel.Debug, "read success {0}", _snapshotState);
 
@@ -424,7 +423,7 @@ namespace Orleans.EventSourcing.Snapshot
             }
             else
             {
-                var count = await _eventStorage.EventsCount(_grainTypeName, Services.GrainReference);
+                var count = await _eventStorage.EventsCount(_grainTypeName, Services.GrainId);
 
                 _snapshotState.StateAndMetaData.GlobalVersion = count + _snapshotState.StateAndMetaData.Log.Count;
             }

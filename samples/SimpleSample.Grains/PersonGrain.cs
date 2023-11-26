@@ -1,7 +1,8 @@
-﻿using Orleans.EventSourcing;
-using SimpleSample.GrainInterfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans.EventSourcing;
+using SimpleSample.GrainInterfaces;
+using SimpleSample.GrainInterfaces.State;
 
 namespace SimpleSample.Grains
 {
@@ -30,32 +31,5 @@ namespace SimpleSample.Grains
         {
             return Task.FromResult(TentativeState.NickName);
         }
-    }
-
-    public class PersonState 
-    {
-        public string NickName { get; private set; } = "anonymous";
-
-        public List<string> HistorySaids { get; private set; } = new List<string>();
-
-        public void Apply(PersonSaidEvent @event) 
-        {
-            HistorySaids.Add(@event.Said);
-        }
-        
-        public void Apply(PersonNickNameUpdatedEvent @event) 
-        {
-            NickName = @event.NewNickName;
-        }
-    }
-
-    public class PersonSaidEvent 
-    {
-        public string Said { get; set; }
-    }
-
-    public class PersonNickNameUpdatedEvent
-    {
-        public string NewNickName { get; set; }
     }
 }
