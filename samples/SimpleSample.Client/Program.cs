@@ -16,11 +16,11 @@ namespace SimpleSample.Client
     {
         static async Task Main(string[] args)
         {
-            var host = await BuildHost();
+            var host = BuildHost();
             await host.RunAsync();
         }
 
-        private static async Task<IHost> BuildHost()
+        private static IHost BuildHost()
         {
             var host = new HostBuilder()
                 .UseOrleansClient(o =>
@@ -37,6 +37,7 @@ namespace SimpleSample.Client
                     services.AddHostedService<BgService>();
                 })
                 .UseConsoleLifetime();
+
             return host.Build();
         }
     }
