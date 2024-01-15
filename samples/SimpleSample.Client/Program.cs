@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Hosting;
-using Orleans.Serialization;
-using SimpleSample.GrainInterfaces.State;
 
 namespace SimpleSample.Client
 {

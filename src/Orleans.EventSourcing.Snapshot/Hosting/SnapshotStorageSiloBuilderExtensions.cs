@@ -53,8 +53,9 @@ namespace Orleans.EventSourcing.Snapshot.Hosting
             }
 
             services
-                .AddSingletonNamedService(name, (sp, n) => LogConsistencyProviderFactory.Create(sp, n, options.SnapshotStrategy))
-                .TryAddSingleton(sp => sp.GetServiceByName<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
+                .AddKeyedSingleton(name,
+                    (sp, name) => LogConsistencyProviderFactory.Create(sp, name as string, options.SnapshotStrategy))
+                .TryAddSingleton(sp => sp.GetKeyedService<ILogViewAdaptorFactory>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
             
             // https://github.com/dotnet/orleans/issues/8157
             services.TryAddSingleton<Factory<IGrainContext, ILogConsistencyProtocolServices>>(serviceProvider =>

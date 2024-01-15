@@ -1,23 +1,11 @@
-﻿using EventStore.ClientAPI;
-using JsonNet.PrivateSettersContractResolvers;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.EventSourcing.Snapshot;
 using Orleans.EventSourcing.Snapshot.Hosting;
 using Orleans.Hosting;
-using Orleans.Providers.MongoDB.Configuration;
-using System;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Orleans.EventSourcing;
-using Orleans.Providers.MongoDB.StorageProviders.Serializers;
-using Orleans.Runtime;
-using Orleans.Runtime.LogConsistency;
-using Orleans.Serialization;
-using SimpleSample.GrainInterfaces.State;
 
 namespace SimpleSample.Silo
 {
@@ -47,11 +35,9 @@ namespace SimpleSample.Silo
                         {
                             logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
                         })
-                        .UseMongoDBClient("mongodb://localhost:27017")
-                        .AddMongoDBGrainStorageAsDefault((MongoDBGrainStorageOptions op) =>
+                        .AddAzureBlobGrainStorageAsDefault(o =>
                         {
-                            op.CollectionPrefix = "GrainStorage";
-                            op.DatabaseName = "SimpleSampleOreleans";
+                            o.ConfigureBlobServiceClient("UseDevelopmentStorage=true");
                         })
                         .AddSnapshotStorageBasedLogConsistencyProviderAsDefault((op, name) =>
                         {
