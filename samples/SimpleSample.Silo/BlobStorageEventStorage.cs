@@ -36,10 +36,11 @@ public class BlobStorage : IGrainEventStorage
         var method = typeof(BinaryData)
             .GetMethods()
             .First(x => x.Name == nameof(BinaryData.ToObjectFromJson));
+
         _toObjectFromJson = (data, type) =>
         {
-            var genericMethod = method!.MakeGenericMethod(type);
-            var result = (Event) genericMethod.Invoke(data, new object?[] { null })!;
+            var genericMethod = method.MakeGenericMethod(type);
+            var result = (Event)genericMethod.Invoke(data, new object[] { null });
             return result;
         };
     }
@@ -129,5 +130,4 @@ public class BlobStorage : IGrainEventStorage
 
         return container;
     }
-        
 }
