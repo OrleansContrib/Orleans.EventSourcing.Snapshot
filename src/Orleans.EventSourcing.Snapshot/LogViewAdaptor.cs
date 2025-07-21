@@ -78,7 +78,7 @@ namespace Orleans.EventSourcing.Snapshot
             {
                 var segmentPart1 = _snapshotState.StateAndMetaData.Log.GetRange(fromVersion, (cachedLogCount - fromVersion));
                 var segmentPart2 = await _eventStorage.ReadEvents<TLogEntry>(
-                    _grainTypeName, Services.GrainId, cachedLogCount, toVersion - cachedLogCount);
+                    _grainTypeName, Services.GrainId, 0, toVersion - cachedLogCount);
 
                 segmentPart1.AddRange(segmentPart2);
                 segment = segmentPart1;
